@@ -24,9 +24,9 @@
         $_SESSION['tusuarios'] = $tusuarios;
         
         foreach($tusuarios as $clave => $dato){
-            if(!file_exists(RUTA_FICHEROS."$clave")){
-                //En Linux habría que añadir los permisos
-                if(!mkdir(RUTA_FICHEROS."$clave")){
+            if(!file_exists(RUTA_FICHEROS.$clave)){
+                //En Linux habría que añadir los permisos (o ponerlos manualmente en el contenido de /dat)
+                if(!mkdir(RUTA_FICHEROS.$clave, 0777, TRUE)){
                     die("Error al crear el directorio de usuario.");
                 }             
             }
@@ -52,7 +52,7 @@
             return "Máster";
         }else{
             //Sino, busco al usuario entre la información decodificada del JSON para devolver 
-            //el plan correspondiente, que determina los derechos de usuario (sin implementar hasta añadir otros niveles de usuario)
+            //el plan correspondiente, que determina los derechos de usuario.
             
         }
     }
@@ -61,8 +61,7 @@
     function modeloUserDel($user){
         if($user == $_SESSION["user"]){
             return false;
-        }
-        
+        }    
         foreach($_SESSION['tusuarios'] as $clave => $dato){  
             if($clave == $user){
                 unset($_SESSION["tusuarios"][$clave]);
@@ -70,14 +69,14 @@
                 modeloUserSave();
                 return true;
             }
-        }
-        
+        }    
         return false;
     }
+    
     // Añadir un nuevo usuario (boolean)
     function modeloUserAdd($user, $password, $nombre, $correo, $plan, $estado){
         foreach($_SESSION['tusuarios'] as $clave => $dato){
-            if($clave == $user){
+            if($clave == $user || $dato[2] == $correo){
                 return false;
             }
         }
@@ -86,16 +85,24 @@
         return true;
     }
     
-    //Actualizar un nuevo usuario (boolean)
+    //Actualizar un usuario (boolean)
     function modeloUserUpdate($user, $password, $nombre, $correo, $plan, $estado){
-        foreach($_SESSION['tusuarios'] as $clave => $dato){
-            if($clave == $user){
-                $_SESSION["tusuarios"][$user] = [$password, $nombre, $correo, $plan, $estado];
-                modeloUserSave();
-                return true;
+        if(!array_key_exists($user, $_SESSION["tusuarios"])){
+            return false;
+        }
+        foreach($_SESSION["tusuarios"] as $clave => $dato){
+            //Compruebo los demás correos.
+            if($clave != $user){
+                //Si el correo introducido ya existe, devuelve false.
+                if($correo == $dato[2]){
+                    return false;
+                }
             }
         }
-        return false;
+        $_SESSION["tusuarios"][$user] = [$password, $nombre, $correo, $plan, $estado];
+        modeloUserSave();
+        return true;
+            
     }
     
     // Tabla de todos los usuarios para visualizar
@@ -112,13 +119,14 @@
         }
         return $tuservista;
     }
+    
     // Datos de un usuario para visualizar
     function modeloUserGet($user){
           $uservista = [];
           $encontrado = false;
           foreach($_SESSION['tusuarios'] as $clave => $datosusuario){
               if($clave == $user){
-                  $uservista = [$datosusuario[1], $datosusuario[2], PLANES[$datosusuario[3]], ESTADOS[$datosusuario[4]]];
+                  $uservista = [$datosusuario[0], $datosusuario[1], $datosusuario[2], PLANES[$datosusuario[3]], ESTADOS[$datosusuario[4]]];
                   $encontrado = true;
                   break;
               }
@@ -132,8 +140,7 @@
     
     // Vuelca los datos al fichero
     function modeloUserSave(){
-        $datosjon = json_encode($_SESSION['tusuarios']);
-        file_put_contents(FILEUSER, $datosjon) or die ("Error al escribir en el fichero.");
-        fclose(FILEUSER);
+        $datosjson = json_encode($_SESSION['tusuarios']);
+        file_put_contents(FILEUSER, $datosjson) or die ("Error al escribir en el fichero.");
     }
 ?>

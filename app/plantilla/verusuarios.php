@@ -5,7 +5,6 @@
 ?>
 <div id='aviso'><b><?= (isset($msg))?$msg:"" ?></b></div>
 <table>
-	<tr>
 <?php  
     $auto = $_SERVER['PHP_SELF'];
     /* identificador => Nombre, email, plan y Estado
@@ -26,17 +25,23 @@
 <?php
     } 
 ?>
-</table>  
+</table>
+<br>  
+<hr>
 <br>
-<form action='index.php'> 
+<form action='index.php' style="display: inline-block; margin-right: 8%;"> 
 	<input type='submit' name="darAlta" value='Dar de alta nuevo usuario'> 
-</form>       
-<br><br>
-<form action='index.php'> 
+</form> 
+
+<form action='index.php' style="display: inline-block; margin-right: 8%;"> 
+	<input type='hidden' name='cambiar'> 
+	<input type='submit' value='Gestionar archivos'> 
+</form>        
+
+<form action='index.php' style="display: inline-block; margin-right: 4%;"> 
 	<input type='hidden' name='orden' value='Cerrar'> 
 	<input type='submit' value='Cerrar sesión'> 
 </form>  
-
 <?php 
     //Vacío el búfer y lo copio a contenido
     //Para que se muestre en el div de contenido de la página principal

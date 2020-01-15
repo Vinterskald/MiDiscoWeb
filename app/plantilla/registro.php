@@ -1,9 +1,10 @@
 <?php
-    //Guardo la salida en un buffer(en memoria)
-    //[No se envia al navegador]
-    ob_start();
+//Guardo la salida en un buffer(en memoria)
+//[No se envia al navegador]
+ob_start();
 ?>
-<form name='ALTA' action="index.php">
+<form action="index.php" method="POST">
+		<input type="hidden" name="registro">
     	<table>
     		<tr>
     			<td>Clave de usuario:</td>
@@ -12,6 +13,10 @@
     		<tr>
     			<td>Contraseña:</td>
     			<td><input type="password" name="pass" required></td>
+    		</tr>
+    		<tr>
+    			<td>Repite la contraseña:</td>
+    			<td><input type="password" name="pass2" required></td>
     		</tr>
     		<tr>
     			<td>Nombre de usuario:</td>
@@ -23,14 +28,15 @@
     		</tr>
     		<tr>
     			<td>Plan:</td>
-    			<td><input type="number" name="plan" min="0" max="2" required></td>
-    		</tr>
-    		<tr>
-    			<td>Estado:</td>
-    			<td><input type="text" name="estado"></td>
+    			<td>
+    				<select name="plan" required>
+    					<option value="0" selected>Básico</option>
+    					<option value="1">Profesional</option>
+    					<option value="2">Premium</option>
+    				</select>
+    			</td>
     		</tr>
     	</table>
-    	<input type='hidden' name='orden' value='Alta'> 
     	<br>
     	<input type="submit" value="Crear usuario">
     </form>

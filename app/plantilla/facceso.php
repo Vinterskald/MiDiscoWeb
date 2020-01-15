@@ -20,6 +20,12 @@
     	<br>
     	<input type="submit" name="orden" value="Entrar">
     </form>
+    <br>
+    <hr>
+    <br>
+    <a href="index.php?registro" style="margin-right: 12%;">¿No tienes usuario? Date de alta</a>
+    <!-- Referencia a sistema de recuperación de credenciales, sin implementar de momento -->
+    <a href="#">He olvidado mi contraseña o identificador de usuario</a>
 <?php 
     //Vacio el bufer y lo copio a contenido
     //Para que se muestre en div de contenido

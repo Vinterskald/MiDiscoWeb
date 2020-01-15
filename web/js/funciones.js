@@ -6,3 +6,9 @@ function confirmarBorrar(nombre,id){
 		document.location.href="?orden=Borrar&id="+id;
 	}
 }
+
+function confirmarBorrarFichero(nombre){
+	if(confirm("¿Quieres eliminar el archivo: "+nombre+"?")){
+		document.location.href="?orden=Borrar&nombre="+nombre;
+	}
+}

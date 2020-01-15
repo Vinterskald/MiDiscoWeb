@@ -4,11 +4,11 @@
     ob_start();
     
 ?>
-<form action='index.php'> 
+<form action='index.php'"> 
     <table>
     	<tr>
         	<td>Identificador de usuario:</td>
-        	<td><input type="text" name="clave" value="<?= $_GET["id"] ?>"></td>
+        	<td style="color: black;"><?= $_GET["id"] ?></td>
         </tr>
         <tr>
         	<td>Contraseña:</td>
@@ -20,18 +20,42 @@
         </tr>
         <tr>
         	<td>Correo:</td>
-        	<td><input type="text"  name="mail" value="<?= $_SESSION["tusuarios"][$_GET["id"]][2] ?>"></td>
+        	<td><input type="email"  name="mail" value="<?= $_SESSION["tusuarios"][$_GET["id"]][2] ?>"></td>
         </tr>
         <tr>
         	<td>Plan:</td>
-        	<td><input type="number" name="plan" value="<?= $_SESSION["tusuarios"][$_GET["id"]][3] ?>" min="0" max="2"></td>
+        	<td>
+    			<select name="plan" required>
+    				<option value="0" selected>Básico</option>
+    				<option value="1">Profesional</option>
+    				<option value="2">Premium</option>
+    				<?php
+    				    if($_SESSION["user"] == "admin"){
+    				        echo "<option value='3'>Máster</option>";
+    				    }
+    				?>
+    			</select>
+    		</td>
         </tr>
-        <tr>
-        	<td>Estado:</td>
-        	<td><input type="text" name="estado" value="<?= $_SESSION["tusuarios"][$_GET["id"]][4] ?>"></td>
-        </tr>
+        <?php
+            if($_SESSION["tipouser"] == "Máster"){
+                echo "
+                    <tr>
+                    	<td>Estado:</td>
+                    	<td>
+        				<select name='estado' required>
+        					<option value='A' selected>Activo</option>
+        					<option value='B'>Bloqueado</option>
+        					<option value='I'>Inactivo</option>
+        				</select>
+    			</td>
+                    </tr>
+                ";
+            }
+        ?>
     </table>
 	<br>
+	<input type="hidden" name="clave" value="<?= $_GET["id"] ?>">
 	<input type="hidden" name="orden" value="Modificar">
 	<input type='submit' value='Guardar'> 
 </form>       

@@ -2,6 +2,9 @@
     //Guardo la salida en un buffer(en memoria)
     //[No se envia al navegador]
     ob_start();
+    
+    
+    //ACTUALIZAR A BUCLE QUE MUESTRE DATOS DE LA VARIABLE
 ?>
 <?php if(isset($_GET["id"])){ ?>
 <table>
@@ -31,7 +34,12 @@
     </tr>
     <tr>
     	<td>Archivos en directorio personal:</td>
-    	<td><?= count(scandir(RUTA_FICHEROS.$_GET["id"])) ?></td>
+    	<!-- Se están excluyendo archivos ocultos y especiales con preg_grep(). -->
+    	<td><?= count(preg_grep("/^([^.])/", scandir(RUTA_FICHEROS.$_GET["id"]))) ?></td>
+    </tr>
+    <tr>
+    	<td>Espacio ocupado:</td>
+    	<td><?= tam_dir(RUTA_FICHEROS.$_GET['id'])." bytes" ?></td>
     </tr>
 </table>
 <?php } ?>
