@@ -9,6 +9,8 @@
 	<input type="submit" name="submit" value="Subir"> 
 </form>
 <br>
+<hr>
+<br>
 <a href="index.php" style="text-decoration: none;"><button>Volver</button></a>
 <?php
     // Vacio el bufer y lo copio a contenido

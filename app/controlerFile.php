@@ -29,13 +29,16 @@
     function ctlFileNuevo(){
         $max_espacio = 0;
         $max_archivos = 0;
-        foreach($_SESSION["tusuarios"] as $usuario => $d){
-            if($usuario == $_SESSION["user"]){
-                $max_espacio = LIMITE_ESPACIO[$_SESSION["tusuarios"][$usuario][4]];
-                $max_archivos = LIMITE_FICHEROS[$_SESSION["tusuarios"][$usuario][4]];
+        foreach($_SESSION['tusuarios'] as $clave => $dato){
+            if($clave == $_SESSION["user"]){
+                $max_espacio = LIMITE_ESPACIO[$dato[3]];
+                $max_archivos = LIMITE_FICHEROS[$dato[3]];
             }
         }
         $espacio_restante = (int) ($max_espacio - tam_dir(RUTA_FICHEROS.$_SESSION["user"]."/"));
+        
+        echo $_FILES["archivo"]["error"];
+        
          
         switch($_FILES["archivo"]["error"]){
             case 0:

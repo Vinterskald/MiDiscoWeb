@@ -23,11 +23,24 @@
     		</tr>
     		<tr>
     			<td>Plan:</td>
-    			<td><input type="number" name="plan" min="0" max="2" required></td>
+    			<td>
+    				<select name="plan">
+    					<option value="0">Básico</option>
+    					<option value="1">Profesional</option>
+    					<option value="2">Premium</option>
+    					<option value="3">Máster</option>
+    				</select>
+    			</td>
     		</tr>
     		<tr>
     			<td>Estado:</td>
-    			<td><input type="text" name="estado"></td>
+    			<td>
+    				<select name="estado">
+    					<option value="A">Activo</option>
+    					<option value="B">Bloqueado</option>
+    					<option value="I">Inactivo</option>
+    				</select>
+    			</td>
     		</tr>
     	</table>
     	<input type='hidden' name='orden' value='Alta'> 
