@@ -1,0 +1,19 @@
+•Búsquedas no ordenadas - algoritmo de (Lov) Grover:
+Aplicado para búsquedas en bases de datos dentro de la computación 
+cuántica, que parte del concepto de la "caja negra", donde se resuelve 
+la búsqueda usando una fórmula que devuelve un valor de output:
+O(-Raíz de-N), donde N es el tamaño de la función del dominio.
+
+------------------------------------------------------------
+•Factorización de grandes números:
+937 x 947 = N (Problema fácil)
+887.339 = p x q (Problema no tan fácil)
+La robustez de la factorización es la base del algoritmo RSA
+
+------------------------------------------------------------
+•Qué es un ordenador cuántico:
+-Se puede inicializar.
+-Utiliza bits cuánticos (Qubits).
+-Trabaja con paralelismo cuántico.
+-Mantiene la coherencia (tiempos relativos a los qubits).
+

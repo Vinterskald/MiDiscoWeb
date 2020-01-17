@@ -37,9 +37,9 @@
             echo "<td>".filesize(RUTA_FICHEROS.$_SESSION["user"]."/".$fichero)." bytes</td>";
         
  ?>
-		<td><a href="<?= $auto?>?orden=Borrar&nombre=<?= $fichero ?>" onclick="confirmarBorrarFichero('<?php echo $fichero; ?>');">Eliminar</a></td>
-		<td><a href="<?= $auto?>?orden=Renombrar&nombre=<?= $fichero ?>">Renombrar</a></td>
-		<td><a href="<?= $auto?>?orden=Compartir&nombre=<?= $fichero ?>">Compartir</a></td>
+		<td><a href="<?= $auto?>?orden=Borrar&archivo=<?= $fichero ?>" onclick="confirmarBorrarFichero(<?php echo $fichero; ?>);">Eliminar</a></td>
+		<td><a href="<?= $auto?>?orden=Renombrar&archivo=<?= $fichero ?>" onclick="renombrar(<?php echo $fichero; ?>);">Renombrar</a></td>
+		<td><a href="<?= $auto?>?orden=Compartir&archivo=<?= $fichero ?>">Compartir</a></td>
 	</tr>
 <?php
         }
@@ -70,10 +70,10 @@
 	           <input type='hidden' name='cambiar'> 
 	           <input type='submit' value='Volver a gestión de usuarios'>
             </form>
+            <br>
         ";
     }
 ?>
-<br>
 <form action='index.php'>
 	<input type='hidden' name='orden' value='Cerrar'> 
 	<input type='submit' value='Cerrar sesión'>

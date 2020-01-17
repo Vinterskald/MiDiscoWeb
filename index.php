@@ -84,7 +84,7 @@
 	                    echo '<html><body><h1>Error 404: No existe la ruta <i>'.$_GET['orden'] .'</p></body></html>';
 	                    exit;
 	                }
-	            }elseif(isset($_POST["archivo"])){
+	            }elseif(isset($_FILES["archivo"])){
 	                $procRuta = "ctlFileNuevo";
 	            }else{
 	                if(isset($_GET["subir"])){

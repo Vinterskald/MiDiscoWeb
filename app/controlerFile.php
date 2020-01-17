@@ -36,10 +36,7 @@
             }
         }
         $espacio_restante = (int) ($max_espacio - tam_dir(RUTA_FICHEROS.$_SESSION["user"]."/"));
-        
-        echo $_FILES["archivo"]["error"];
-        
-         
+           
         switch($_FILES["archivo"]["error"]){
             case 0:
                 $dir_archivo = RUTA_FICHEROS.$_SESSION["user"]."/".basename($_FILES["archivo"]["name"]);
@@ -49,13 +46,13 @@
                     echo "</script>";
                     break;
                 }
-                if($_FILES["archivo"]["size"] > $espacio_restante){
+                if($_FILES["archivo"]["size"] > $espacio_restante && $_SESSION["tipouser"] != "Máster"){
                     echo "<script language='JavaScript'>";
                     echo "alert('Error: el archivo excede tu límite de espacio en disco.');";
                     echo "</script>";
                     break;
                 }
-                if(count(preg_grep("/^([^.])/", scandir(RUTA_FICHEROS.$_SESSION["user"]."/"))) > $max_archivos){
+                if(count(preg_grep("/^([^.])/", scandir(RUTA_FICHEROS.$_SESSION["user"]."/"))) > $max_archivos && $_SESSION["tipouser"] != "Máster"){
                     echo "<script language='JavaScript'>";
                     echo "alert('Error: no puedes subir más archivos.');";
                     echo "</script>";
@@ -101,14 +98,66 @@
     }
     
     function ctlFileBorrar(){
-        
+        if(!isset($_GET["archivo"])){
+            echo "<script language='JavaScript'>";
+            echo "alert('Error de referencia de archivo.');";
+            echo "</script>";
+        }else{
+            $encontrado = false;
+            foreach(scandir(RUTA_FICHEROS.$_SESSION["user"]."/") as $fichero){
+                if($fichero == $_GET["archivo"]){
+                    $encontrado = true;
+                    if(!unlink($fichero)){
+                        echo "<script language='JavaScript'>";
+                        echo "alert('No se ha podido eliminar el fichero seleccionado.');";
+                        echo "</script>";
+                    }else{
+                        echo "<script language='JavaScript'>";
+                        echo "alert('Fichero eliminado con éxito.');";
+                        echo "</script>";
+                    }
+                }
+            }
+            if(!$encontrado){
+                echo "<script language='JavaScript'>";
+                echo "alert('Error al encontrar el fichero en el directorio.');";
+                echo "</script>";
+            }
+        }
+        ctlFileVerFicheros();
     }
     
     function ctlFileRenombrar(){
-        
+        if(!isset($_GET["archivo"])){
+            echo "<script language='JavaScript'>";
+            echo "alert('Error de referencia de archivo.');";
+            echo "</script>";
+        }else{
+            $encontrado = false;
+            foreach(scandir(RUTA_FICHEROS.$_SESSION["user"]."/") as $fichero){
+                if($_GET["archivo"] == $fichero){
+                    $encontrado = true;
+                    if(!rename(RUTA_FICHEROS.$_SESSION["user"]."/".$fichero, RUTA_FICHEROS.$_SESSION["user"]."/".$_GET["archivo"])){
+                        echo "<script language='JavaScript'>";
+                        echo "alert('No se ha podido renombrar el fichero seleccionado.');";
+                        echo "</script>";
+                    }else{
+                        echo "<script language='JavaScript'>";
+                        echo "alert('Nombre actualizado.');";
+                        echo "</script>";
+                    }
+                }
+            }
+            if(!$encontrado){
+                echo "<script language='JavaScript'>";
+                echo "alert('Error al encontrar el fichero en el directorio.');";
+                echo "</script>";
+            }
+        }
+        ctlFileVerFicheros();
     }
     
     function ctlFileCompartir(){
-        
+        ctlFileVerFicheros();
     }
 ?>
