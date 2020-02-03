@@ -3,7 +3,9 @@
     // Controlador que realiza la gestión de usuarios
     // ------------------------------------------------
     include_once 'config.php';
-    include_once 'modeloUser.php';
+    //include_once 'modeloUser.php';
+    include_once 'modeloUserDB.php';
+    include_once 'usuarios.php';
     
     /*
      * Inicio Muestra o procesa el formulario (POST)
@@ -17,23 +19,31 @@
             if(isset($_POST['user']) && isset($_POST['clave'])){
                 $user =$_POST['user'];
                 $clave=$_POST['clave'];
-                if(modeloOkUser($user,$clave)){
-                    $_SESSION['user'] = $user;
-                    $_SESSION['tipouser'] = modeloObtenerTipo($user);
-                    if($_SESSION['tipouser'] == "Máster"){
-                        $_SESSION['modo'] = GESTIONUSUARIOS;
-                        header('Location:index.php?orden=VerUsuarios');
-                    }else{
-                        if($_SESSION["tusuarios"][$_SESSION["user"]][4] == "I" || $_SESSION["tusuarios"][$_SESSION["user"]][4] == "B"){
-                            $msg = "Error: el usuario no está activado o está bloqueado.";
+                if(ModeloUserDB::OkUser($user, $clave)){
+                    if(ModeloUserDB::UserGet($user) != null){
+                        $datos = ModeloUserDB::UserGet($user);
+                        $_SESSION["user"] = new usuarios($datos);
+                        $tipouser = ModeloUserDB::ObtenerTipo($user);
+                        if($tipouser == "Máster"){
+                            if($datos[5] != "A"){
+                                $msg = TMENSAJES["USERNOACTIVO"];
+                            }else{
+                                $_SESSION["user"]->__set("perfil", GESTIONUSUARIOS);
+                                header('Location:index.php?orden=VerUsuarios');
+                            }
                         }else{
-                            $_SESSION['modo'] = GESTIONFICHEROS;
-                            // Cambio de modo y redireccion a verficheros
-                            header("Location: index.php?orden=VerFicheros");
+                            if($datos[5] != "A"){
+                                $msg = TMENSAJES["USERNOACTIVO"];
+                            }else{
+                                $_SESSION["user"]->__set("perfil", GESTIONFICHEROS);
+                                header("Location: index.php?orden=VerFicheros");
+                            }
                         }
+                    }else{
+                        $msg = "Error al intentar crear el objeto de usuario";
                     }
                 }else{
-                    $msg="Error: usuario y / o contraseña no válidos.";
+                    $msg = TMENSAJES["LOGINERROR"];
                }  
             }
         } 
@@ -47,35 +57,34 @@
             exit();
         }elseif(isset($_POST["registro"])){
             if($_POST["pass"] != $_POST["pass2"]){
-                echo "<script language='JavaScript'>";
-                echo "alert('No se ha podido registrar el usuario; las contraseñas no coinciden.');";
-                echo "</script>";  
-                exit();
-            }
-            if(!modeloUserAdd($_POST["clave"], $_POST["pass"], $_POST["nombre"], $_POST["mail"], $_POST["plan"], "I")){
-                echo "<script language='JavaScript'>";
-                echo "alert('No se ha podido registrar el usuario; nombre y/o correo ya en uso.');";    
-                echo "</script>";                
+                $msg = TMENSAJES["PASSDIST"];
             }else{
-                echo "<script language='JavaScript'>";
-                echo "alert('Usuario registrado con éxito.');";
-                echo "</script>";  
-            }
+                if(!UserAdd($_POST["clave"], $_POST["pass"], $_POST["nombre"], $_POST["mail"], $_POST["plan"], "I")){
+                    $msg = TMENSAJES["USERNOSAVE"];
+                }else{
+                    $msg = TMENSAJES["USERREG"];
+                }
+            }   
         }
     }
     
     // Cambia de modo desde la sesión de administración.
     function cambiarModo(){
-        if(isset($_SESSION["modo"]) && $_SESSION["tipouser"] == "Máster"){
-            if($_SESSION["modo"] == GESTIONUSUARIOS){
-                $_SESSION["modo"] = GESTIONFICHEROS;
-                header("Location:index.php?orden=VerFicheros");
+        if(isset($_SESSION["user"])){
+            $usuario = $_SESSION["user"];
+            if(ESTADOS[]){
+                if($_SESSION["modo"] == GESTIONUSUARIOS){
+                    $_SESSION["modo"] = GESTIONFICHEROS;
+                    header("Location:index.php?orden=VerFicheros");
+                }else{
+                    $_SESSION["modo"] = GESTIONUSUARIOS;
+                    header("Location:index.php?orden=VerUsuarios");
+                }
             }else{
-                $_SESSION["modo"] = GESTIONUSUARIOS;
-                header("Location:index.php?orden=VerUsuarios");
+                die("Error al cambiar el tipo de gestión.");
             }
         }else{
-            die("Error al cambiar el tipo de gestión.");
+            die("Error grave: sin usuario activo.");
         }
     }
     

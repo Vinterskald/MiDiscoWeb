@@ -3,13 +3,15 @@
 	include_once 'app/config.php';
 	include_once 'app/controlerFile.php';
 	include_once 'app/controlerUser.php';
-	include_once 'app/modeloUser.php';
+	//include_once 'app/modeloUser.php';
+	include_once "app/modeloUserDB.php";
+	include_once 'app/usuarios.php';
 
-	//Inicializo el modelo
-	modeloUserInit();
+	//Inicializo el modelo (actualizado a clase de acceso a BD)
+	//modeloUserInit();
+	ModeloUserDB::init();
 	
 	//Relación entre peticiones y función que la va a tratar
-	//Versión sin POO no manejo de Clases ni objetos
 	
 	//Enrutamiento para el modo "Gestión de usuarios" (solo admin)
 	$rutasUser = [
@@ -21,7 +23,6 @@
 		"Cerrar"      => "ctlUserCerrar",
 		"VerUsuarios" => "ctlUserVerUsuarios"
 	];
-	
 	
 	//Enrutamiento para ficheros (admin y otros usuarios)
 	$rutasFicheros = [
@@ -39,7 +40,7 @@
 	registro();
 	
 	//Si no hay usuario a Inicio
-	if(!isset($_SESSION['user'])){
+	if(!isset($usuario)){
 		$procRuta = "ctlUserInicio";
 	}else{
 	    if(isset($_REQUEST["cambiar"])){
@@ -99,6 +100,11 @@
 	        }
 	    }
 	}
+	
+	if (isset($_GET['msg'])){
+	    $msg = $_GET['msg'];
+	}
+	
 	// Llamo a la función seleccionada
 	if($procRuta == "ctlUserVerUsuarios"){
 	    $procRuta(null);
