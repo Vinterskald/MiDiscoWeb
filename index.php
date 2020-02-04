@@ -39,14 +39,15 @@
 	//Método para comprobar si se quiere registrar un usuario y su gestión.
 	registro();
 	
-	//Si no hay usuario a Inicio
-	if(!isset($usuario)){
+	//Si no hay (objeto) usuario, a Inicio
+	if(!isset($_SESSION["user"])){
 		$procRuta = "ctlUserInicio";
 	}else{
+	    $usuario = $_SESSION["user"];
 	    if(isset($_REQUEST["cambiar"])){
 	        cambiarModo();
 	    }else{
-	        if($_SESSION['modo'] == GESTIONUSUARIOS){
+	        if($usuario->perfil == GESTIONUSUARIOS){
 	            if(isset($_GET['orden'])){
 	                //La orden tiene una funcion asociada
 	                if(isset($rutasUser[$_GET['orden']])){
@@ -68,7 +69,7 @@
 	                    $procRuta = "ctlUserVerUsuarios";
 	                }
 	            }
-	        }elseif($_SESSION['modo'] == GESTIONFICHEROS){
+	        }elseif($usuario->perfil == GESTIONFICHEROS){
 	            if(isset($_GET["modificar"])){
 	                include_once "app/plantilla/modificaruser.php";
 	                exit();
@@ -99,10 +100,6 @@
 	            $procRuta = "ctlUserInicio";
 	        }
 	    }
-	}
-	
-	if (isset($_GET['msg'])){
-	    $msg = $_GET['msg'];
 	}
 	
 	// Llamo a la función seleccionada

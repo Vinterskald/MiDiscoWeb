@@ -1,4 +1,6 @@
 <?php
+    include_once 'config.php';
+    include_once 'usuarios.php';
     // --------------------------------------------------------------
     // Controlador que realiza la gestión de ficheros de un usuario
     // ---------------------------------------------------------------

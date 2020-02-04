@@ -28,14 +28,14 @@
                             if($datos[5] != "A"){
                                 $msg = TMENSAJES["USERNOACTIVO"];
                             }else{
-                                $_SESSION["user"]->__set("perfil", GESTIONUSUARIOS);
+                                $_SESSION["user"]->perfil = GESTIONUSUARIOS;
                                 header('Location:index.php?orden=VerUsuarios');
                             }
                         }else{
                             if($datos[5] != "A"){
                                 $msg = TMENSAJES["USERNOACTIVO"];
                             }else{
-                                $_SESSION["user"]->__set("perfil", GESTIONFICHEROS);
+                                $_SESSION["user"]->perfil = GESTIONFICHEROS;
                                 header("Location: index.php?orden=VerFicheros");
                             }
                         }
@@ -59,7 +59,7 @@
             if($_POST["pass"] != $_POST["pass2"]){
                 $msg = TMENSAJES["PASSDIST"];
             }else{
-                if(!UserAdd($_POST["clave"], $_POST["pass"], $_POST["nombre"], $_POST["mail"], $_POST["plan"], "I")){
+                if(!ModeloUserDB::UserAdd($_POST["clave"], $_POST["pass"], $_POST["nombre"], $_POST["mail"], $_POST["plan"], "I")){
                     $msg = TMENSAJES["USERNOSAVE"];
                 }else{
                     $msg = TMENSAJES["USERREG"];
@@ -72,16 +72,16 @@
     function cambiarModo(){
         if(isset($_SESSION["user"])){
             $usuario = $_SESSION["user"];
-            if(ESTADOS[]){
-                if($_SESSION["modo"] == GESTIONUSUARIOS){
-                    $_SESSION["modo"] = GESTIONFICHEROS;
+            if(ESTADOS[$usuario->estado] == "Máster"){
+                if($usuario->perfil == GESTIONUSUARIOS){
+                    $usuario->perfil = GESTIONFICHEROS;
                     header("Location:index.php?orden=VerFicheros");
                 }else{
-                    $_SESSION["modo"] = GESTIONUSUARIOS;
+                    $usuario->perfil = GESTIONUSUARIOS;
                     header("Location:index.php?orden=VerUsuarios");
                 }
             }else{
-                die("Error al cambiar el tipo de gestión.");
+                die("Error: solo un usuario de tipo Máster puede cambiar su perfil de gestión.");
             }
         }else{
             die("Error grave: sin usuario activo.");
@@ -91,7 +91,7 @@
     // Cierra la sesión y vuelva los datos
     function ctlUserCerrar(){
         session_destroy();
-        modeloUserSave();
+        //modeloUserSave();
         header('Location:index.php');
     }
     
@@ -101,40 +101,38 @@
             $msg = $mensaje;
         }
         // Obtengo los datos del modelo
-        $usuarios = modeloUserGetAll(); 
+        $usuarios = ModeloUserDB::GetAll(); 
         // Invoco la vista 
         include_once 'plantilla/verusuarios.php';   
     }
     
     function ctlUserModificar(){
-        $msg = "";
-        if(isset($_REQUEST["clave"])){
-            if(!modeloUserUpdate($_REQUEST["clave"], $_REQUEST["pass"], $_REQUEST["nombre"], $_REQUEST["mail"], $_REQUEST["plan"], $_REQUEST["estado"])){
-                $msg = "Error: el correo especificado ya está en uso o hay un problema con el usuario.";
-                if($_SESSION["modo"] == GESTIONUSUARIOS){
+        if(isset($_SESSION["usuario"])){  
+            $usuario = $_SESSION["usuario"];
+            $msg = "";
+            if(isset($_REQUEST["clave"])){
+                if(!ModeloUserDB::UserUpdate($_REQUEST["id"], $_REQUEST["pass"], $_REQUEST["nombre"], $_REQUEST["mail"], $_REQUEST["plan"], $_REQUEST["estado"])){
+                    $msg = TMENSAJES["ERRORUPDATE"];
+                    if($usuario->perfil == GESTIONUSUARIOS){
+                        ctlUserVerUsuarios($msg);
+                    }else{
+                        ctlFileVerFicheros($msg);
+                    }
+                }else{
+                    $msg = TMENSAJES["USERUPDATE"];
+                    if($usuario->perfil == GESTIONUSUARIOS){
+                        ctlUserVerUsuarios($msg);
+                    }else{
+                        ctlFileVerFicheros($msg);    
+                    }
+                }
+            }else{
+                $msg = TMENSAJES["ERRORUPDATE"];
+                if($usuario->perfil == GESTIONUSUARIOS){
                     ctlUserVerUsuarios($msg);
                 }else{
-                    echo "<script language='javascript'>";
-                    echo "alert('Error: no se ha podido actualizar el usuario.');";
-                    echo "</script>";
-                    ctlFileVerFicheros();
+                    ctlFileVerFicheros($msg);
                 }
-            }else{
-                echo "<script language='javascript'>";
-                echo "alert('Cambios en usuario añadidos correctamente.');";
-                echo "</script>";
-                if($_SESSION["modo"] == GESTIONUSUARIOS){
-                    ctlUserVerUsuarios(null);
-                }else{
-                    ctlFileVerFicheros();    
-                }
-            }
-        }else{
-            $msg = "Error: no se ha especificado clave de usuario.";
-            if($_SESSION["modo"] == GESTIONUSUARIOS){
-                ctlUserVerUsuarios($msg);
-            }else{
-                ctlFileVerFicheros();
             }
         }
     }

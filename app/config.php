@@ -3,7 +3,7 @@
     define('DBSERVER','127.0.0.1');
     define('DBNAME','discoweb' );
     define('DBUSER','root');
-    define('DBPASSWORD','DoManniskoPesten2_');
+    define('DBPASSWORD','');
     
     //Tipo de acciones:
     define('GESTIONUSUARIOS','1');

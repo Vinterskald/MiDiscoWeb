@@ -124,7 +124,7 @@
             return false;
         }
         //Añadir un nuevo usuario (boolean)
-        public static function UserAdd($user, $pass, $nom, $correo, $plan, $estado){
+        public static function UserAdd(string $user, string $pass, string $nom, string $correo, int $plan, string $estado):bool{
             if(self::ExisteID($user)) return false;
             if(self::ExisteEmail($correo)) return false;
             $error = self::ErrorValoresAlta($user, $pass, $nom, $correo, $plan, $estado);
@@ -132,19 +132,44 @@
                 $query = "INSERT INTO usuarios VALUES(?, ?, ?, ?, ?, ?)";
                 $stmt = self::$dbh->prepare($query);
                 $stmt->bindValue(1, $user);
-                $stmt->bindValue(2, $pass);
+                $stmt->bindValue(2, cifrador::cifrar($pass));
                 $stmt->bindValue(3, $nom);
                 $stmt->bindValue(4, $correo);
                 $stmt->bindValue(5, $plan);
                 $stmt->bindValue(6, $estado);
+                if($stmt->execute()){
+                    return true;
+                }
             }
             return false; 
         }
         
         //Actualizar un nuevo usuario (boolean)
-        public static function UserUpdate($userid, $userdat){
-            
-            
+        public static function UserUpdate(string $user, string $clave, string $nombre, string $email, int $plan, string $estado):bool{
+            $queryMaster = "UPDATE usuarios SET clave = ?, nombre = ?, email = ?, plan = ?, estado = ? WHERE id = ?";
+            $queryUser = "UPDATE usuarios SET clave = ?, nombre = ?, email = ?, plan = ? WHERE id = ?";
+            if(PLANES[$plan] == "Máster"){
+                $stmt = self::$dbh->prepare($queryMaster);
+                $stmt->bindValue(1, cifrador::cifrar($clave));
+                $stmt->bindValue(2, $nombre);
+                $stmt->bindValue(3, $email);
+                $stmt->bindValue(4, $plan);
+                $stmt->bindValue(5, $estado);
+                $stmt->bindValue(6, $user);
+                if($stmt->execute()){
+                    return true;
+                }
+            }else{
+                $stmt = self::$dbh->prepare($queryUser);
+                $stmt->bindValue(1, cifrador::cifrar($clave));
+                $stmt->bindValue(2, $nombre);
+                $stmt->bindValue(3, $email);
+                $stmt->bindValue(4, $plan);
+                $stmt->bindValue(5, $user);
+                if($stmt->execute()){
+                    return true;
+                }
+            }
             return false; 
         }
         

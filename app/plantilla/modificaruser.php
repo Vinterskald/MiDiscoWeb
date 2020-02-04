@@ -55,7 +55,7 @@
         ?>
     </table>
 	<br>
-	<input type="hidden" name="clave" value="<?= $_GET["id"] ?>">
+	<input type="hidden" name="id" value="<?= $_GET["id"] ?>">
 	<input type="hidden" name="orden" value="Modificar">
 	<input type='submit' value='Guardar'> 
 </form>       
