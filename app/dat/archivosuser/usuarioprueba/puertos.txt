@@ -1,7 +1,0 @@
-•Puerto 53 -> Puerto reservado para protocolo DNS, con conexiones UDP para consultas de los clientes y TCP para sincronización entre servidores.
-•
-•
-•
-•
-•
-•

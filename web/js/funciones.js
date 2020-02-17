@@ -18,13 +18,6 @@ function confirmarBorrarFichero(nombre){
 }
 
 function renombrar(archivo){
-	var nuevo = prompt("Introduce el nuevo nombre: ", archivo);
-	
-	if(nuevo == null || nuevo == ""){
-		alert("Ningún nombre nuevo introducido.");
-		document.location.href="?";
-	}else{
-		alert("Nombre del archivo modificado.");
-		document.location.href="index.php?orden=Renombrar&nombre="+archivo;
-	}
+	var nuevo = prompt("Escribe el nuevo nombre del archivo:", archivo);
+	document.location.href="index.php?orden=Renombrar&nuevo="+nuevo+"&archivo="+archivo;
 }

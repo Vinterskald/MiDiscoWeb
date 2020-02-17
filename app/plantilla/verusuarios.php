@@ -3,6 +3,7 @@
     //[No se envia al navegador]
     ob_start();
 ?>
+<h3>Listado de usuarios</h3>
 <div id='aviso'><b><?= (isset($msg))?$msg:"" ?></b></div>
 <table>
 <?php  

@@ -1,9 +1,9 @@
 <?php
     // DATOS DE CONEXION
     define('DBSERVER','127.0.0.1');
-    define('DBNAME','discoweb' );
+    define('DBNAME','discoweb');
     define('DBUSER','root');
-    define('DBPASSWORD','');
+    define('DBPASSWORD','DoManniskoPesten2_');
     
     //Tipo de acciones:
     define('GESTIONUSUARIOS','1');
@@ -32,6 +32,7 @@
         'USREXIST'     => "El ID del usuario ya existe",
         'USRERROR'     => "El ID de usuario solo puede tener letras y números",
         'PASSDIST'     => "Los valores de la contraseñas no son iguales",
+        'USERLENG'     => "El ID del usuario debe tener de 5 a 10 caracteres",
         'PASSEASY'     => "La contraseña no es segura",
         'MAILERROR'    => "El correo electrónico no es correcto",
         'MAILREPE'     => "La dirección de correo ya está repetida",
@@ -45,33 +46,31 @@
         'ERRORADDUSER' => "Error: No se puede añadir el usuario",
         'USERREG'      => "Usuario registrado. Introduzca sus datos",
         'USERDEL'      => "Usuario eliminado.",
-        'ERRORDEL'     => "Error no se puede eliminar el usuario."
+        'ERRORDEL'     => "Error no se puede eliminar el usuario.",
+        'ERRORUSER'    => "Error: no se ha determinado usuario o el usuario no se puede eliminar."
     ];
     
     //Funciones para el checkeo de la contraseña:
-    function hayMayusculas($clave):bool{
-        if(ctype_upper($clave)){
+    function hayMayusculas($clave){
+        if(strtolower($clave) != $clave){
             return true;
         }
         return false;
     }
     
-    function hayMinusculas($clave):bool{
-        if(ctype_lower($clave)){
+    function hayMinusculas($clave){
+        if(strtoupper($clave) != $clave){
             return true;
         }
         return false;
     }
     
-    function hayDigito($clave):bool{
-        if(ctype_digit($clave)){
-            return true;
-        }
-        return false;
+    function hayDigito($clave){
+        return preg_match("/\d/", $clave);
     }
     
-    function hayNoAlfanumeric($clave):bool{
-        if(ctype_alnum($clave)){
+    function hayNoAlfanumeric($clave){
+        if(!ctype_alnum($clave)){ //Si todos los caracteres fueran alfanuméricos, no sería correcto.
             return true;
         }
         return false;

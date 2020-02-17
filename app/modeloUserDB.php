@@ -12,7 +12,7 @@
                 try{
                     // Cambiar  los valores de las constantes en config.php
                     $dsn = "mysql:host=".DBSERVER.";dbname=".DBNAME.";charset=utf8";
-                    self::$dbh = new PDO($dsn,DBUSER,DBPASSWORD);
+                    self::$dbh = new PDO($dsn, DBUSER, DBPASSWORD);
                     // Si se produce un error se genera una excepción;
                     self::$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 }catch(PDOException $e){
@@ -27,10 +27,10 @@
             $stmt = self::$dbh->prepare(self::$consulta_user);
             $stmt->bindValue(1,$user);
             $stmt->execute();  
-            if($stmt->rowCount() > 0 ){
+            if($stmt->rowCount() > 0){
                 $stmt->setFetchMode(PDO::FETCH_ASSOC);
                 $fila = $stmt->fetch();
-                $clavecifrada = $fila['clave'];
+                $clavecifrada = cifrador::cifrar($clave);
                 if(cifrador::verificar($clave, $clavecifrada)){
                     return true;
                 }
@@ -64,38 +64,52 @@
         /*
          * Chequea si hay error en los datos antes de guardarlos
          */
-        public static function ErrorValoresAlta($user,$clave1, $nombre, $email, $plan, $estado){
-            if(modeloExisteID($user))                         return TMENSAJES['USREXIST'];
+        public static function ErrorValoresAlta($user, $clave1, $clave2, $nombre, $email, $plan, $estado){
+            if(strlen($user) < 5 || strlen($user > 10))       return TMENSAJES["USERLENG"];
+            if(self::ExisteID($user))                         return TMENSAJES['USREXIST'];
             if(preg_match("/^[a-zA-Z0-9]+$/", $user) == 0)    return TMENSAJES['USRERROR'];
             if($clave1 != $clave2)                            return TMENSAJES['PASSDIST'];
-            if(!esClaveSegura($clave1))                       return TMENSAJES['PASSEASY'];
+            if(!self::EsClaveSegura($clave1))                 return TMENSAJES['PASSEASY'];
             if(!filter_var($email, FILTER_VALIDATE_EMAIL))    return TMENSAJES['MAILERROR']; //Filtro de variables nativo de PHP.
-            if(modeloExisteEmail($user))                      return TMENSAJES['MAILREPE'];
+            if(self::ExisteEmail($user))                      return TMENSAJES['MAILREPE'];
             return false;
         }
         
-        public static function ErrorValoresModificar($user, $clave1, $nombre, $email, $plan, $estado){
-            if($clave1 != $clave2 )                           return TMENSAJES['PASSDIST'];
-            if(!modeloEsClaveSegura($clave1))                 return TMENSAJES['PASSEASY'];
+        public static function ErrorValoresModificar($user, $clave1, $clave2, $nombre, $email, $plan, $estado){
+            if($clave1 != $clave2)                            return TMENSAJES['PASSDIST'];
+            if(!self::EsClaveSegura($clave1))                 return TMENSAJES['PASSEASY'];
             if(!filter_var($email, FILTER_VALIDATE_EMAIL))    return TMENSAJES['MAILERROR'];
             //Si se cambia el email
-            $emailantiguo = modeloGetEmail($user);
-            if($email != $emailantiguo && existeEmail($user)) return TMENSAJES['MAILREPE'];
+            $emailantiguo = self::GetEmail($user);
+            if($email != $emailantiguo && self::ExisteEmail($user)) return TMENSAJES['MAILREPE'];
             return false;
         }
         
         /*
          * Comprueba que la contraseña es segura
          */
-        public static function EsClaveSegura(String $clave):bool {
+        public static function EsClaveSegura(String $clave):bool{
             if(empty($clave)) return false;
-            if(strlen($clave) < 8 ) return false;
+            if(strlen($clave) < 8) return false;
             if(!hayMayusculas($clave) || !hayMinusculas($clave)) return false;
             if(!hayDigito($clave)) return false;
-            if(!hayNoAlfanumerico($clave)) return false;         
+            if(!hayNoAlfanumeric($clave)) return false;   
             return true;
         }
-             
+        
+        //Obtener el correo electrónico del usuario:
+        public static function GetEmail($user){
+            $stmt = self::$dbh->prepare(self::$consulta_email);
+            $stmt->bindValue(1, $user);
+            if($stmt->execute()){
+                while($fila = $stmt->fetch()){
+                    $correo = $fila["email"];
+                }
+                return $correo;
+            }
+            return false;
+        }
+        
         //Devuelve el plan de usuario (String)
         public static function ObtenerTipo($user):string{
             $query = "SELECT plan FROM usuarios WHERE id = ?";
@@ -123,11 +137,9 @@
             }
             return false;
         }
-        //Añadir un nuevo usuario (boolean)
-        public static function UserAdd(string $user, string $pass, string $nom, string $correo, int $plan, string $estado):bool{
-            if(self::ExisteID($user)) return false;
-            if(self::ExisteEmail($correo)) return false;
-            $error = self::ErrorValoresAlta($user, $pass, $nom, $correo, $plan, $estado);
+        //Añadir un nuevo usuario
+        public static function UserAdd(string $user, string $pass, string $pass2, string $nom, string $correo, int $plan, string $estado){
+            $error = self::ErrorValoresAlta($user, $pass, $pass2, $nom, $correo, $plan, $estado);
             if($error == false){
                 $query = "INSERT INTO usuarios VALUES(?, ?, ?, ?, ?, ?)";
                 $stmt = self::$dbh->prepare($query);
@@ -140,17 +152,27 @@
                 if($stmt->execute()){
                     return true;
                 }
+                return false;
             }
-            return false; 
+            return $error; 
         }
         
         //Actualizar un nuevo usuario (boolean)
         public static function UserUpdate(string $user, string $clave, string $nombre, string $email, int $plan, string $estado):bool{
             $queryMaster = "UPDATE usuarios SET clave = ?, nombre = ?, email = ?, plan = ?, estado = ? WHERE id = ?";
             $queryUser = "UPDATE usuarios SET clave = ?, nombre = ?, email = ?, plan = ? WHERE id = ?";
-            if(PLANES[$plan] == "Máster"){
+            $datosuser = self::UserGet($user);
+            if($datosuser[1] == $clave){
+                $cifrada = true;
+            }
+            
+            if(unserialize($_SESSION["user"])->getPlan() == "Máster"){
                 $stmt = self::$dbh->prepare($queryMaster);
-                $stmt->bindValue(1, cifrador::cifrar($clave));
+                if($cifrada == true){
+                    $stmt->bindValue(1, $clave);
+                }else{
+                    $stmt->bindValue(1, cifrador::cifrar($clave));
+                }
                 $stmt->bindValue(2, $nombre);
                 $stmt->bindValue(3, $email);
                 $stmt->bindValue(4, $plan);
@@ -161,7 +183,11 @@
                 }
             }else{
                 $stmt = self::$dbh->prepare($queryUser);
-                $stmt->bindValue(1, cifrador::cifrar($clave));
+                if($cifrada == true){
+                    $stmt->bindValue(1, $clave);
+                }else{
+                    $stmt->bindValue(1, cifrador::cifrar($clave));
+                }
                 $stmt->bindValue(2, $nombre);
                 $stmt->bindValue(3, $email);
                 $stmt->bindValue(4, $plan);
@@ -195,14 +221,19 @@
         }
         
         // Datos de un usuario para visualizar
-        public static function UserGet($userid):array{
-            $stmt = self::$dbh->query("SELECT * FROM usuarios where id = ?");
+        public static function UserGet($userid){
+            $stmt = self::$dbh->prepare("SELECT * FROM usuarios where id = ?");
+            $stmt->bindValue(1, $userid);
             $userVista = [];
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
-            while($fila = $stmt->fetch()){
-                $userVista = [$fila["id"], $fila["clave"], $fila["nombre"], $fila["email"], PLANES[$fila["plan"]], ESTADOS[$fila["estado"]]];
+            $stmt->execute();
+            if($stmt->rowCount() > 0){
+                while($fila = $stmt->fetch()){
+                    $userVista = [$fila["id"], $fila["clave"], $fila["nombre"], $fila["email"], PLANES[$fila["plan"]], ESTADOS[$fila["estado"]]];
+                }
+                return $userVista;
             }
-            return $userVista;
+            return false;
         }
         
         public static function closeDB(){

@@ -14,6 +14,10 @@
     			<td><input type="password" name="pass" required></td>
     		</tr>
     		<tr>
+    			<td>Repite la contraseña:</td>
+    			<td><input type="password" name="pass2" required></td>
+    		</tr>
+    		<tr>
     			<td>Nombre de usuario:</td>
     			<td><input type="text" name="nombre" required></td>
     		</tr>

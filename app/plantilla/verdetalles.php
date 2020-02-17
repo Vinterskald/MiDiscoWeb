@@ -6,31 +6,34 @@
     
     //ACTUALIZAR A BUCLE QUE MUESTRE DATOS DE LA VARIABLE
 ?>
-<?php if(isset($_GET["id"])){ ?>
+<?php  
+    if(isset($_GET["id"])){
+        $datosuser = ModeloUserDB::UserGet($_GET["id"]);
+?>
 <table>
 	<tr>
     	<td>Identificador de usuario:</td>
-    	<td><?php echo $_GET["id"]; ?></td>
+    	<td><?= $datosuser[0] ?></td>
     </tr>
     <tr>
-    	<td>Contraseña:</td>
-    	<td><?php echo $_SESSION["tusuarios"][$_GET["id"]][0]; ?></td>
+    	<td>Contraseña (encript.):</td>
+    	<td><?= $datosuser[1] ?></td>
     </tr>
     <tr>
     	<td>Nombre de usuario:</td>
-    	<td><?php echo $_SESSION["tusuarios"][$_GET["id"]][1]; ?></td>
+    	<td><?= $datosuser[2] ?></td>
     </tr>
     <tr>
     	<td>Correo:</td>
-    	<td><?php echo $_SESSION["tusuarios"][$_GET["id"]][2]; ?></td>
+    	<td><?= $datosuser[3] ?></td>
     </tr>
     <tr>
     	<td>Tipo de plan:</td>
-    	<td><?php echo $_SESSION["tusuarios"][$_GET["id"]][3]." - ".PLANES[$_SESSION["tusuarios"][$_GET["id"]][3]]; ?></td>
+    	<td><?php echo $datosuser[4];?></td>
     </tr>
     <tr>
     	<td>Estado:</td>
-    	<td><?php echo $_SESSION["tusuarios"][$_GET["id"]][4]." - ".ESTADOS[$_SESSION["tusuarios"][$_GET["id"]][4]]; ?></td>
+    	<td><?php echo $datosuser[5];?></td>
     </tr>
     <tr>
     	<td>Archivos en directorio personal:</td>

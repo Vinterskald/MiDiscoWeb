@@ -1,12 +1,12 @@
 <?php
 	session_start();
+	require_once 'app/usuarios.php';
 	include_once 'app/config.php';
 	include_once 'app/controlerFile.php';
 	include_once 'app/controlerUser.php';
 	//include_once 'app/modeloUser.php';
 	include_once "app/modeloUserDB.php";
-	include_once 'app/usuarios.php';
-
+	
 	//Inicializo el modelo (actualizado a clase de acceso a BD)
 	//modeloUserInit();
 	ModeloUserDB::init();
@@ -31,23 +31,27 @@
 	    "Borrar"      => "ctlFileBorrar",
 	    "Renombrar"   => "ctlFileRenombrar",
 	    "Compartir"   => "ctlFileCompartir",
-	    "Cerrar"      => "ctlUserCerrar"/*,
-	    "Descargar"   => "ctlFileDescargar"*/
+	    "Cerrar"      => "ctlUserCerrar",
+	    "Descargar"   => "ctlFileDescargar"
 	];
 	
 	//--------------------------------------------------------------------
 	//Método para comprobar si se quiere registrar un usuario y su gestión.
-	registro();
-	
+	$msg = registro();
 	//Si no hay (objeto) usuario, a Inicio
 	if(!isset($_SESSION["user"])){
+	    if(isset($_GET["orden"]) && $_GET["orden"] == "DescargaDirecta"){
+	        ctlFileDescargaDirecta();
+	    }
+	    
 		$procRuta = "ctlUserInicio";
 	}else{
-	    $usuario = $_SESSION["user"];
+	    $usuario = unserialize($_SESSION["user"]);
 	    if(isset($_REQUEST["cambiar"])){
 	        cambiarModo();
 	    }else{
-	        if($usuario->perfil == GESTIONUSUARIOS){
+	        //var_dump($usuario->getPerfil());
+	        if($usuario->getPerfil() == GESTIONUSUARIOS){
 	            if(isset($_GET['orden'])){
 	                //La orden tiene una funcion asociada
 	                if(isset($rutasUser[$_GET['orden']])){
@@ -69,7 +73,7 @@
 	                    $procRuta = "ctlUserVerUsuarios";
 	                }
 	            }
-	        }elseif($usuario->perfil == GESTIONFICHEROS){
+	        }elseif($usuario->getPerfil() == GESTIONFICHEROS){
 	            if(isset($_GET["modificar"])){
 	                include_once "app/plantilla/modificaruser.php";
 	                exit();
@@ -103,9 +107,11 @@
 	}
 	
 	// Llamo a la función seleccionada
-	if($procRuta == "ctlUserVerUsuarios"){
+	if($procRuta == "ctlUserVerUsuarios" || $procRuta == "ctlFileVerFicheros"){
 	    $procRuta(null);
+	}elseif($procRuta == "ctlUserInicio"){
+	    $procRuta($msg);
 	}else{
-	   $procRuta();
+	    $procRuta();
 	}
 ?>

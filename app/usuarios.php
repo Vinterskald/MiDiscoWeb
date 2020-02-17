@@ -19,30 +19,49 @@
             $this->plan = $datos[4];
             $this->estado = $datos[5];
         }
+        //Getter y setter manuales:
         
-        //-------------------------------------------------------
-        //Funciones:
-        //Redifino el método __get (método mágico):
-        public function __get($atributo){
-            if(property_exists($this, $atributo)) {
-                return $this->$atributo;
-            }
-            trigger_error("Atributo no definido ", E_USER_NOTICE);
-            return null;
+        //Getters:
+        public function getId(){
+            return $this->id;
         }
-        
-        //Redefino el método __set:
-        public function __set($atributo, $valor){
-            if(property_exists($this, $atributo)) {
-                $this->$atributo = $valor;
-            }
-            trigger_error("Atributo no definido ", E_USER_NOTICE);
+        public function getContra(){
+            return $this->contra;
         }
-        
+        public function getNombre(){
+            return $this->nombre;
+        }
+        public function getCorreo(){
+            return $this->correo;
+        }
+        public function getPlan(){
+            return $this->plan;
+        }
+        public function getPerfil(){
+            return $this->perfil;
+        }
+        public function getEstado(){
+            return $this->estado;
+        }
+        //Setters:
+        public function setContra($contra){
+            $this->contra = $contra;
+        }
+        public function setNombre($nombre){
+            $this->nombre = $nombre;
+        }
+        public function setCorreo($correo){
+            $this->correo = $correo;
+        }
+        public function setPlan($plan){
+            $this->plan = $plan;
+        }
+        public function setPerfil($perfil){
+            $this->perfil = $perfil;
+        }
+        public function setEstado($estado){
+            $this->estado = $estado;
+        }
         //------------------------------------------------------------------------------------------------------------------
-    }
-    //Clase administrador con sus funciones propias:
-    class administrador extends usuarios{
-        
     }
 ?>

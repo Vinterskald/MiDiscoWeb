@@ -3,7 +3,7 @@
     // No se envia al navegador
     ob_start();
 ?>
-    <div id='aviso'><b><?= (isset($msg))?$msg:"" ?></b></div>
+    <div id='aviso'><b><?php if(isset($msg)) echo $msg; ?></b></div>
     <form name='ACCESO' method="POST" action="index.php">
     	<table>
     		<tr>
